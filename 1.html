@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+  <div v-for="(item, index) in dataAll">
+    <el-table
+            :ref="item.bVo.idxsss"
+            :data="item.tableData"
+            :span-method="objectSpanMethod"
+            tooltip-effect="dark"
+            style="width: 100%"
+            @select="(list, citem) => handleSelect(list, citem, index)"
+            @selection-change="val => handleSelectionChange(val, index)">
+      <el-table-column
+              type="selection"
+              width="55">
+      </el-table-column>
+      <el-table-column
+              prop="id"
+              label="姓名"
+              width="55">
+      </el-table-column>
+      <el-table-column
+              prop="amount1"
+              label="姓名"
+              width="55">
+      </el-table-column>
+      <el-table-column
+              label="日期"
+              width="120">
+        <template slot-scope="scope">{{ scope.row.date }}</template>
+      </el-table-column>
+      <el-table-column
+              prop="name"
+              label="姓名"
+              width="120">
+      </el-table-column>
+      <el-table-column
+              prop="address"
+              label="地址"
+              show-overflow-tooltip>
+      </el-table-column>
+    </el-table>
+  </div>
+  <pre>{{multipleSelectionToJSONString}}</pre>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                spanArr: [],//用于存放每一行记录的合并数
+                dataAll: [
+                    {
+                        bVo: {
+                          idxsss: 0
+                        },
+                        tableData: [{
+                                id: "1",
+                                name: "王小虎",
+                                amount1: "234"
+                            },
+                            {
+                                id: "1",
+                                name: "王小虎",
+                                amount1: "165"
+                            },
+                            {
+                                id: "2",
+                                name: "王小虎",
+                                amount1: "324"
+                            },
+                            {
+                                id: "2",
+                                name: "王小虎",
+                                amount1: "621"
+                            },
+                            {
+                                id: "2",
+                                name: "王小虎",
+                                amount1: "539"
+                            }]
+                    },
+                    {
+                        bVo: {
+                            idxsss: 1
+                        },
+                        tableData: [{
+                            id: "1",
+                            name: "王小虎1",
+                            amount1: "234",
+                        },
+                            {
+                                id: "1",
+                                name: "王小虎1",
+                                amount1: "165"
+                            },
+                            {
+                                id: "2",
+                                name: "王小虎2",
+                                amount1: "324"
+                            },
+                            {
+                                id: "2",
+                                name: "王小虎2",
+                                amount1: "621"
+                            },
+                            {
+                                id: "2",
+                                name: "王小虎2",
+                                amount1: "539"
+                            }]
+                    }
+                ],
+                multipleSelection: []
+            }
+        },
+        // computed:{
+        //     multipleSelectionToJSONString(){
+        //         return JSON.stringify(this.multipleSelection, null, 2)
+        //     }
+        // },
+        mounted() {
+            this.getSpanArr(this.dataAll[0].tableData);
+            // this.getSpanArr(this.dataAll[1].tableData);
+        },
+        methods: {
+            /**
+             * @params list 选中的数据
+             * @params citem 点击的数据
+             * @params index 当前表格的索引值
+             */
+            handleSelect(list, citem, index){
+                console.log('handleSelect', arguments)
+                this.$nextTick(v=>{
+                    // 找出当前点击数据后的同id的数据并改变其状态
+                    this.dataAll[index].tableData.filter(v=>v.id == citem.id).forEach(v=>{
+                        this.$refs[this.dataAll[index].bVo.idxsss][0].toggleRowSelection(v, list.includes(citem));
+                    })
+                })
+            },
+            handleSelectionChange(val, index) {
+                console.log('handleSelectionChange', arguments)
+                this.multipleSelection[index] = val;
+                console.log(this.multipleSelection)
+            },
+            getSpanArr(data) {
+                // data就是我们从后台拿到的数据
+                for (var i = 0; i < data.length; i++) {
+                    if (i === 0) {
+                        this.spanArr.push(1);
+                        this.pos = 0;
+                    } else {
+                        // 判断当前元素与上一个元素是否相同
+                        if (data[i].id === data[i - 1].id) {
+                            this.spanArr[this.pos] += 1;
+                            this.spanArr.push(0);
+                        } else {
+                            this.spanArr.push(1);
+                            this.pos = i;
+                        }
+                    }
+                    console.log(this.spanArr);
+                }
+            },
+            objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+                if (columnIndex === 0 || columnIndex === 1) {
+                    const _row = this.spanArr[rowIndex];
+                    const _col = _row > 0 ? 1 : 0;
+                    console.log(`rowspan:${_row} colspan:${_col}`);
+                    return {
+                        // [0,0] 表示这一行不显示， [2,1]表示行的合并数
+                        rowspan: _row,
+                        colspan: _col
+                    };
+                }
+            }
+        }
+    })
+</script>
+</body>
+</html>
