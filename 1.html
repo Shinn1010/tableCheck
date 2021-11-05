@@ -47,7 +47,6 @@
       </el-table-column>
     </el-table>
   </div>
-  <pre>{{multipleSelectionToJSONString}}</pre>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/element-ui/lib/index.js"></script>
@@ -122,11 +121,6 @@
                 multipleSelection: []
             }
         },
-        // computed:{
-        //     multipleSelectionToJSONString(){
-        //         return JSON.stringify(this.multipleSelection, null, 2)
-        //     }
-        // },
         mounted() {
             this.getSpanArr(this.dataAll[0].tableData);
             // this.getSpanArr(this.dataAll[1].tableData);
